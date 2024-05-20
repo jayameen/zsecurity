@@ -24,7 +24,6 @@ var Common = {
     },
     //////////////////////////////////////////////////////////////////////////////////////////
     showError: function (response) {
-      console.log(response);
       try {
           if (response?.status == 401 || response?.status == 403) {
               Common.retryLoginUsingRefreshToken();
@@ -37,6 +36,7 @@ var Common = {
               let responseObject = response.responseJSON;
               toastr.error(responseObject.status.toUpperCase() + " - " + responseObject?.description);
           }else{
+
               toastr.error(JSON.stringify(response));
           }
       }catch (e){
