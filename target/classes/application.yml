@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: zsecurity
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+  servlet:
+    multipart:
+      max-file-size: 10000000
+      max-request-size: 10000000
+
+server:
+  port: 8082
+  servlet:
+    context-path: /${spring.application.name}
+
+app:
+  static-min-url: ${server.servlet.context-path}/assets
+  key-cloak-realm-url: http://localhost:8080/auth/realms/jayameen
+  key-cloak-client-secret: 1puPsVD0ffzlxaG2r9oChEAnA5UhZvgU
+  key-cloak-logout-url: ${key-cloak-realm-url}/protocol/openid-connect/logout
+
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+
+  security:
+    oauth2:
+      client:
+        registration:
+          zsecurity:
+            provider: keycloak
+            client-id: zsecurity
+            client-secret: ${app.key-cloak-client-secret}
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://localhost:8082/zsecurity/login/authcode"
+            scope: openid
+        provider:
+          keycloak:
+            authorization-uri: ${app.key-cloak-realm-url}/protocol/openid-connect/auth
+            token-uri: ${app.key-cloak-realm-url}/protocol/openid-connect/token
+            jwk-set-uri: ${app.key-cloak-realm-url}/protocol/openid-connect/certs
+      resourceserver:
+        jwt:
+          issuer-uri: ${app.key-cloak-realm-url}
+          jwk-set-uri: ${app.key-cloak-realm-url}/protocol/openid-connect/certs
+          introspection-uri: ${app.key-cloak-realm-url}/protocol/openid-connect/token/introspect
+        opaquetoken:
+          client-id: zsecurity
+          client-secret: ${app.key-cloak-client-secret}
+          issuer-uri: ${app.key-cloak-realm-url}
+          introspection-uri: ${app.key-cloak-realm-url}/protocol/openid-connect/token/introspect
